@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap');
+
+* {
+    padding: 0%;
+    margin: 0%;
+    font-family: "Gloria Hallelujah", cursive;
+}
+
+.container {
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(-45deg, #f37be3, #8e528a, #ffdee9, #855777);
+    background-size: 400% 400%;
+    animation: gradientFlow 6s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.box {
+    height: 40vh;
+    width: 50vw;
+    background-color: #DB8DD0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 20px;
+}
+
+h2 {
+    margin-bottom: 35px;
+    font-size: 40px;
+}
+
+button {
+    margin-bottom: 40px;
+    height: 80%;
+    width: 60%;
+    border: 0cap;
+    background-color: #C562AF;
+    border-radius: 20px;
+    font-size: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+input {
+    border: 0cap;
+    background-color: #C562AF;
+    margin-bottom: 10px;
+    width: 60%;
+    height: 50%;
+    border-radius: 20px;
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+input::placeholder {
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+@media screen and (max-width: 1400px) {
+    .box {
+        height: 50vh;
+        width: 80vw;
+    }
+
+    h2 {
+        font-size: 30px;
+    }
+
+    button {
+        height: 6vh;
+        width: 60vw;
+    }
+}
