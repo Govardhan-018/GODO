@@ -68,13 +68,82 @@ app.post("/checkuser", async (req, res) => {
                 st: "fail"
             })
         }
-    } catch(err) {
+    } catch (err) {
         console.error(err)
         res.status(401).json({ st: "fail" })
     }
 
 })
 
+app.post("/addtodo", async (req, res) => {
+    const data = req.body.data
+    var key = req.body.key
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")[0]
+    const query = "INSERT INTO godo (email,todo) VALUES ($1,$2)"
+    try {
+        await db.query(query, [email, data])
+        res.status(201).json({
+            st: "success"
+        });
+    } catch (err) {
+        console.log(err)
+        res.status(401).json({
+            st: "fail"
+        });
+    }
+})
+app.post("/gettodo", async (req, res) => {
+    var key = req.body.key
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")[0]
+    const query = "SELECT * FROM godo WHERE email=$1"
+    try {
+        const data = await db.query(query, [email])
+        res.status(201).json({
+            st: "success", data: data.rows
+        })
+    } catch (err) {
+        res.status(401).json({
+            st: "fail"
+        })
+    }
+})
+app.post("/deltodo", async (req, res) => {
+    var key = req.body.key
+    const id = req.body.id
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")[0]
+    const query = "DELETE FROM godo WHERE id=$1 AND email=$2"
+    try {
+        const data = await db.query(query, [id, email])
+        res.status(201).json({
+            st: "success", data: data.rows
+        })
+    } catch (err) {
+        res.status(401).json({
+            st: "fail"
+        })
+    }
+})
+app.post("/editodo", async (req, res) => {
+    var key = req.body.key
+    const id = req.body.id
+    const todo = req.body.todo
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")[0]
+    const query = "UPDATE godo SET todo = $1 WHERE id = $2 AND email = $3"
+    try {
+        const data = await db.query(query, [todo, id, email])
+        res.status(201).json({
+            st: "success", data: data.rows
+        })
+    } catch (err) {
+        res.status(401).json({
+            st: "fail"
+        })
+    }
+})
 app.listen(port, (req, res) => {
     console.log("Server is hosten on " + port)
 })

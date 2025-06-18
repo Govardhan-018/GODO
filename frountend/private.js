@@ -1,12 +1,15 @@
-let key;
-const server = "http://192.168.1.103:3069/addtodo";
+let key, todos
+const ipad = "http://192.168.1.103:3069/"
+const server = `${ipad}addtodo`
+const get = `${ipad}gettodo`
+const delet = `${ipad}deltodo`
+const editdo = `${ipad}editodo`
 
 window.addEventListener("message", (event) => {
     const receivedData = event.data;
     if (receivedData && receivedData.key) {
         key = receivedData.key;
-        sessionStorage.setItem("key", key); // Save for reload
-        console.log("Received and stored key:", key);
+        sessionStorage.setItem("key", key);
         initializePageWithKey();
     }
 });
@@ -17,7 +20,6 @@ window.addEventListener("DOMContentLoaded", () => {
         const storedKey = sessionStorage.getItem("key");
         if (storedKey) {
             key = storedKey;
-            console.log("Reload detected. Restored key:", key);
             initializePageWithKey();
         } else {
             console.warn("Reload detected, but no key stored.");
@@ -25,7 +27,30 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function initializePageWithKey() {
+async function initializePageWithKey() {
+    try {
+        const response = await fetch(get, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: key })
+        });
+
+        const result = await response.json();
+        todos = result.data
+        result.data.forEach(element => {
+            document.querySelector(".box").innerHTML = `
+             <div class="ydo">
+                <h3>${element.todo}</h3>
+                <form class="form"><input type="hidden" value="${element.id}" class="id"><button class="bt"><img
+                            src="../images/delete.svg" class="delete" alt="delete"></button></form>
+                <form class="editform"><input type="hidden" value="${element.id}" class="editid"><button
+                        class="btedit"><img src="../images/edit.svg" class="edit" alt="edit"></button></form>
+            </div>` + document.querySelector(".box").innerHTML
+        });
+    } catch (err) {
+        console.log(err)
+        location.reload()
+    }
     const addButton = document.querySelector(".add");
     if (addButton) {
         addButton.addEventListener("click", addform);
@@ -41,11 +66,63 @@ function initializePageWithKey() {
             }
         });
     }
+    document.querySelectorAll(".bt").forEach(button => {
+        button.addEventListener("click", delt);
+    });
+    document.querySelectorAll(".btedit").forEach(button => {
+        button.addEventListener("click", edit);
+    });
+
 }
+function edit(event) {
+    const id = event.target.closest("form").querySelector(".editid").value;
+    const match = todos.find(eve => eve.id == id);
+    const todovalue = match ? match.todo : "";
+    document.querySelector(".box").innerHTML = `
+        <div class="input">
+           <form>
+            <input type="text" class="editodo" placeholder="Enter your todo" value="${todovalue}" maxlength="30" autofocus>
+            <input type="hidden" class="editodoid" value="${id}">
+            <button class="editdone">
+            <img src="../images/done.svg" alt="done">
+            </button>
+            </form>
+        </div>` + document.querySelector(".box").innerHTML;
+    document.querySelector(".editdone").addEventListener("click", editdata)
+}
+async function editdata(params) {
+    const id = params.target.closest("form").querySelector(".editodoid").value;
+    const data = params.target.closest("form").querySelector(".editodo").value;
+    try {
+        await fetch(editdo, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: key, id: id, todo: data })
+        });
+        location.reload()
+    } catch (err) {
+        console.log(err)
+        location.reload()
+    }
+}
+async function delt(event) {
+    const id = event.target.closest("form").querySelector(".id").value;
+    try {
+        await fetch(delet, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: key, id: id })
+        });
 
-async function submitData() {
-    const data = document.querySelector(".todo").value;
+        location.reload()
+    } catch (err) {
+        console.log(err)
+        location.reload()
+    }
 
+}
+async function submitData(event) {
+    const data = event.target.closest("form").querySelector(".todo").value;
     try {
         const response = await fetch(server, {
             method: "POST",
@@ -53,34 +130,26 @@ async function submitData() {
             body: JSON.stringify({ key: key, data: data })
         });
 
-        console.log("Status:", response.status);
         const result = await response.json();
-        console.log(result.st);
 
-        if (result.st === "success") {
-            alert("Todo added successfully");
-        } else {
+        if (result.st === "fail") {
+
             alert("Failed to add todo.");
         }
     } catch (error) {
         console.error("Request failed:", error);
         alert("Error occurred. Trying to resend key...");
     }
+    location.reload()
 }
 
 function addform() {
     document.querySelector(".box").innerHTML = `
         <div class="input">
-            <input type="text" class="todo" placeholder="Enter your todo" autofocus>
+            <form>
+            <input type="text" class="todo" placeholder="Enter your todo" maxlength="30" required autofocus>
+           <button class="btdone"> <img src="../images/done.svg" alt="done"></button>
+            </form>
         </div>` + document.querySelector(".box").innerHTML;
-
-    const newTodo = document.querySelector(".todo");
-    if (newTodo) {
-        newTodo.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                submitData();
-            }
-        });
-    }
+    document.querySelector(".btdone").addEventListener("click", submitData)
 }
