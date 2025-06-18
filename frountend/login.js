@@ -47,11 +47,11 @@ async function submitData() {
         });
         console.log(response.status)
         console.log("Status:", response.status);
-        const result= await response.json()
+        const result = await response.json()
         console.log(result.st)
-         if(result.st=="success"){
+        if (result.st == "success") {
             const newWindow = window.open("home.html");
-  
+
             if (newWindow) {
                 newWindow.addEventListener("load", () => {
                     newWindow.postMessage({ key: key }, "*");

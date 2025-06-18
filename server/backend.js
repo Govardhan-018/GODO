@@ -54,10 +54,12 @@ app.post("/checkuser", async (req, res) => {
     const code = req.body.key
     let op = customDecrypt(code, 42)
     let [email, pass] = op.split("::")
+    console.log(email + pass)
     const query = "SELECT pass from useraunth WHERE email=$1"
     try {
-        const data = await db.query(query, email)
-        if (data.pass = pass) {
+        const data = await db.query(query, [email])
+        console.log(data.rows[0].pass)
+        if (data.rows[0].pass === pass) {
             res.status(201).json({
                 st: "success"
             });
@@ -66,10 +68,9 @@ app.post("/checkuser", async (req, res) => {
                 st: "fail"
             })
         }
-    } catch {
-        res.status(401).json({
-            st: "fail"
-        });
+    } catch(err) {
+        console.error(err)
+        res.status(401).json({ st: "fail" })
     }
 
 })

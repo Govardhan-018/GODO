@@ -1,12 +1,27 @@
-let key
+let key; 
 
-window.addEventListener("message", async (event) => {
-    key = event.data.key;
+window.addEventListener("message", (event) => {
+    const receivedData = event.data;
+    if (receivedData && receivedData.key) {
+        key = receivedData.key;
+        console.log("Received and assigned the key:", key);
+
+        initializePageWithKey();
+    }
 });
 
-document.getElementById("family").addEventListener("click", familydodo)
+
+function initializePageWithKey() {
+    document.getElementById("family").addEventListener("click", familydodo);
+    document.getElementById("personal").addEventListener("click", personal);
+}
+
 
 function familydodo() {
+    if (!key) {
+        alert("Key not received yet. Please wait a moment.");
+        return;
+    }
     const newWindow = window.open("family.html");
 
     if (newWindow) {
@@ -19,6 +34,10 @@ function familydodo() {
 }
 
 function personal() {
+    if (!key) {
+        alert("Key not received yet. Please wait a moment.");
+        return;
+    }
     const newWindow = window.open("private.html");
 
     if (newWindow) {
