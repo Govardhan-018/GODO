@@ -35,11 +35,13 @@ db.connect()
 
 app.post("/creatuser", async (req, res) => {
     const code = req.body.key
+    const name = req.body.name
+    const family = req.body.family
     let op = customDecrypt(code, 42)
     let [email, pass] = op.split("::")
-    const query = "INSERT INTO useraunth (email,pass) VALUES ($1,$2)"
+    const query = "INSERT INTO useraunth (email,pass,name,family_name) VALUES ($1,$2,$3,$4)"
     try {
-        await db.query(query, [email, pass])
+        await db.query(query, [email, pass, name, family])
         res.status(201).json({
             status: "success"
         });
@@ -54,7 +56,6 @@ app.post("/checkuser", async (req, res) => {
     const code = req.body.key
     let op = customDecrypt(code, 42)
     let [email, pass] = op.split("::")
-    console.log(email + pass)
     const query = "SELECT pass from useraunth WHERE email=$1"
     try {
         const data = await db.query(query, [email])
@@ -144,6 +145,57 @@ app.post("/editodo", async (req, res) => {
         })
     }
 })
+app.post("/fname", async (req, res) => {
+    var key = req.body.key
+    key = await customDecrypt(key, 42)
+    let [email, pass] = key.split("::")
+    const query = "SELECT * FROM useraunth WHERE email=$1 AND pass=$2 "
+    try {
+        const data = await db.query(query, [email, pass])
+        const fname = data.rows[0].family_name
+        const nam = data.rows[0].name
+        res.status(200).json({
+            fname: fname,
+            name:nam
+        })
+    } catch (err) {
+        res.status(401)
+        console.log(err)
+    }
+})
+app.post("/ftodo", async (req, res) => {
+    const family = req.body.fname
+    const query = "SELECT * FROM family WHERE family_name=$1"
+    try {
+        const data = await db.query(query, [family])
+        res.status(200).json({
+            data: data.rows
+        })
+    } catch (err) {
+        res.status(401)
+        console.log(err)
+    }
+})
+app.post("/fadd", async (req, res) => {
+    const family = req.body.fname
+    const nam = req.body.name
+    var key = req.body.key
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")
+    const data = req.body.data
+    const query = "INSERT INTO family (email,todo,name,family_name) VALUES ($1,$2,$3,$4)"
+    try {
+        await db.query(query, [email, data, nam, family])
+        res.status(201).json({
+            st: "success"
+        });
+    } catch (err) {
+        console.log(err)
+        res.status(401).json({
+            st: "fail"
+        });
+    }
+})
 app.listen(port, (req, res) => {
-    console.log("Server is hosten on " + port)
+    console.log("Server is host on " + port)
 })

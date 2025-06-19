@@ -1,13 +1,24 @@
-let email, pass, key;
-const server = "http://192.168.1.103:3069/creatuser";
+let email, pass, key, nam, family;
+const server = "http://192.168.1.102:3069/creatuser";
 
+document.getElementById("name").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("email").focus();
+    }
+});
 document.getElementById("email").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("family").focus();
+    }
+});
+document.getElementById("family").addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         event.preventDefault();
         document.getElementById("pass").focus();
     }
 });
-
 document.getElementById("pass").addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -31,8 +42,9 @@ function customEncrypt(email, password, key = 7) {
 async function submitData() {
     email = document.getElementById("email").value;
     pass = document.getElementById("pass").value;
-
-    if (!email || !pass) {
+    nam = document.getElementById("name").value;
+    family = document.getElementById("family").value;
+    if (!email || !pass || !nam) {
         alert("Email and password are required.");
         return;
     }
@@ -43,7 +55,7 @@ async function submitData() {
         const response = await fetch(server, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, key: key })
+            body: JSON.stringify({ email, key: key, name: nam, family: family })
         });
         console.log(response.status)
         console.log("Status:", response.status);

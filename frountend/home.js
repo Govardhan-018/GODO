@@ -31,7 +31,7 @@ function initializePageWithKey() {
 
 
 function familydodo() {
-    if (!key) {
+   if (!key) {
         alert("Key not received yet. Please wait a moment.");
         return;
     }

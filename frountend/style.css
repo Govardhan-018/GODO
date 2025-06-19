@@ -9,9 +9,7 @@
 .container {
     height: 100vh;
     width: 100vw;
-    background: linear-gradient(-45deg, #f37be3, #8e528a, #ffdee9, #855777);
-    background-size: 400% 400%;
-    animation: gradientFlow 6s ease infinite;
+    background-color: #DB8DD0;
     display: flex;
     justify-content: center;
     align-items: center;
