@@ -1,8 +1,10 @@
 let key, family, todos, nam
-const ipad = "http://192.168.1.102:3069/"
+const ipad = "http://192.168.1.5:3069/"
 const server1 = `${ipad}fname`
 const server2 = `${ipad}ftodo`
 const server3 = `${ipad}fadd`
+const server4 = `${ipad}fdelet`
+const server5 = `${ipad}fedit`
 window.addEventListener("message", (event) => {
     console.log("Received message event:", event.data);
     const receivedData = event.data;
@@ -51,7 +53,8 @@ async function initializePageWithKey() {
         result2.data.forEach(element => {
             document.querySelector(".box").innerHTML = `
              <div class="ydo">
-                <h3>${element.todo}</h3>
+             <h3 class="name">${element.name}</h3>
+                <h3 class="todoo">${element.todo}</h3>
                 <form class="form"><input type="hidden" value="${element.id}" class="id"><button class="bt"><img
                             src="../images/delete.svg" class="delete" alt="delete"></button></form>
                 <form class="editform"><input type="hidden" value="${element.id}" class="editid"><button
@@ -59,6 +62,7 @@ async function initializePageWithKey() {
             </div>` + document.querySelector(".box").innerHTML
         })
     } catch (err) {
+        alert(err)
         console.log("Error occurred:", err);
     }
     const addButton = document.querySelector(".add");
@@ -82,6 +86,56 @@ async function initializePageWithKey() {
     document.querySelectorAll(".btedit").forEach(button => {
         button.addEventListener("click", edit);
     });
+}
+
+async function delt(event) {
+    const id = event.target.closest("form").querySelector(".id").value;
+    try {
+        await fetch(server4, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: key, id: id, family: family })
+        });
+
+        location.reload()
+    } catch (err) {
+        alert(err)
+        console.log(err)
+        location.reload()
+    }
+
+}
+function edit(event) {
+    const id = event.target.closest("form").querySelector(".editid").value;
+    const match = todos.find(eve => eve.id == id);
+    const todovalue = match ? match.todo : "";
+    document.querySelector(".box").innerHTML = `
+        <div class="input">
+           <form>
+            <input type="text" class="editodo" placeholder="Enter your todo" value="${todovalue}" maxlength="30" autofocus>
+            <input type="hidden" class="editodoid" value="${id}">
+            <button class="editdone">
+            <img src="../images/done.svg" alt="done">
+            </button>
+            </form>
+        </div>`+ document.querySelector(".box").innerHTML
+    document.querySelector(".editdone").addEventListener("click", editdata)
+}
+async function editdata(params) {
+    const id = params.target.closest("form").querySelector(".editodoid").value;
+    const data = params.target.closest("form").querySelector(".editodo").value;
+    try {
+        await fetch(server5, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: key, id: id, todo: data, family: family })
+        });
+        location.reload()
+    } catch (err) {
+        console.log(err)
+        alert(err)
+        location.reload()
+    }
 }
 function addform() {
     const tempDiv = document.createElement('div');
@@ -125,6 +179,7 @@ async function submitData() {
         })
         location.reload()
     } catch (error) {
+        alert(err)
         console.error("Request failed:", error)
         location.reload()
     }

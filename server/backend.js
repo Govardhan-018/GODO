@@ -156,7 +156,7 @@ app.post("/fname", async (req, res) => {
         const nam = data.rows[0].name
         res.status(200).json({
             fname: fname,
-            name:nam
+            name: nam
         })
     } catch (err) {
         res.status(401)
@@ -181,7 +181,7 @@ app.post("/fadd", async (req, res) => {
     const nam = req.body.name
     var key = req.body.key
     key = await customDecrypt(key, 42)
-    let email = key.split("::")
+    let email = key.split("::")[0]
     const data = req.body.data
     const query = "INSERT INTO family (email,todo,name,family_name) VALUES ($1,$2,$3,$4)"
     try {
@@ -194,6 +194,44 @@ app.post("/fadd", async (req, res) => {
         res.status(401).json({
             st: "fail"
         });
+    }
+})
+app.post("/fdelet", async (req, res) => {
+    var key = req.body.key
+    const id = req.body.id
+    const family = req.body.family
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")[0]
+    console.log(id+email+family)
+    const query = "DELETE FROM family WHERE id=$1 AND email=$2 AND family_name=$3"
+    try {
+        await db.query(query, [id, email, family])
+        res.status(201).json({
+            st: "success"
+        })
+    } catch (err) {
+        res.status(401).json({
+            st: "fail"
+        })
+    }
+})
+app.post("/fedit", async (req, res) => {
+    var key = req.body.key
+    const id = req.body.id
+    const todo = req.body.todo
+    const family=req.body.family
+    key = await customDecrypt(key, 42)
+    let email = key.split("::")[0]
+    const query = "UPDATE family SET todo = $1 WHERE id = $2 AND email = $3 AND family_name=$4"
+    try {
+        const data = await db.query(query, [todo, id, email,family])
+        res.status(201).json({
+            st: "success", data: data.rows
+        })
+    } catch (err) {
+        res.status(401).json({
+            st: "fail"
+        })
     }
 })
 app.listen(port, (req, res) => {

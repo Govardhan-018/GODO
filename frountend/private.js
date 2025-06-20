@@ -1,5 +1,5 @@
 let key, todos
-const ipad = "http://192.168.1.102:3069/"
+const ipad = "http://192.168.1.5:3069/"
 const server = `${ipad}addtodo`
 const get = `${ipad}gettodo`
 const delet = `${ipad}deltodo`
@@ -37,7 +37,7 @@ async function initializePageWithKey() {
 
         const result = await response.json();
         todos = result.data
-        result.data.forEach(element => {
+        todos.forEach(element => {
             document.querySelector(".box").innerHTML = `
              <div class="ydo">
                 <h3>${element.todo}</h3>

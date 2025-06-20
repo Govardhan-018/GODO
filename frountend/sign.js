@@ -1,5 +1,5 @@
 let email, pass, key, nam, family;
-const server = "http://192.168.1.102:3069/creatuser";
+const server = "http://192.168.1.5:3069/creatuser";
 
 document.getElementById("name").addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
