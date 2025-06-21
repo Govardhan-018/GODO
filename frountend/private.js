@@ -1,9 +1,4 @@
-let key, todos
-const ipad = "http://192.168.1.5:3069/"
-const server = `${ipad}addtodo`
-const get = `${ipad}gettodo`
-const delet = `${ipad}deltodo`
-const editdo = `${ipad}editodo`
+let key, todos, ip, ipad, server, get, delet, editdo
 
 window.addEventListener("message", (event) => {
     const receivedData = event.data;
@@ -27,7 +22,22 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+async function fetchIP() {
+    try {
+        const response = await fetch("../ip.txt");
+        ip = await response.text();
+        ipad = `http://${ip}:3069/`
+        server = `${ipad}addtodo`
+        get = `${ipad}gettodo`
+        delet = `${ipad}deltodo`
+        editdo = `${ipad}editodo`
+    } catch (error) {
+        console.error("Could not fetch IP:", error);
+    }
+}
+
 async function initializePageWithKey() {
+    fetchIP()
     try {
         const response = await fetch(get, {
             method: "POST",

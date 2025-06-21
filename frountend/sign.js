@@ -1,6 +1,5 @@
-let email, pass, key, nam, family;
-const server = "http://192.168.1.5:3069/creatuser";
-
+let email, pass, key, nam, family,ip,server
+fetchIP()
 document.getElementById("name").addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         event.preventDefault();
@@ -25,6 +24,16 @@ document.getElementById("pass").addEventListener("keydown", (event) => {
         submitData();
     }
 });
+
+async function fetchIP() {
+    try {
+        const response = await fetch("../ip.txt");
+        ip = await response.text();
+        server= `http://${ip}:3069/creatuser`
+    } catch (error) {
+        console.error("Could not fetch IP:", error);
+    }
+}
 
 function customEncrypt(email, password, key = 7) {
     const combined = `${email}::${password}`;

@@ -1,10 +1,4 @@
-let key, family, todos, nam
-const ipad = "http://192.168.1.5:3069/"
-const server1 = `${ipad}fname`
-const server2 = `${ipad}ftodo`
-const server3 = `${ipad}fadd`
-const server4 = `${ipad}fdelet`
-const server5 = `${ipad}fedit`
+let key, family, todos, nam, ip, ipad, server1, server2, server3, server4, server5
 window.addEventListener("message", (event) => {
     console.log("Received message event:", event.data);
     const receivedData = event.data;
@@ -31,7 +25,23 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 })
 
+async function fetchIP() {
+    try {
+        const response = await fetch("../ip.txt");
+        ip = await response.text()
+        ipad = `http://${ip}:3069/`
+        server1 = `${ipad}fname`
+        server2 = `${ipad}ftodo`
+        server3 = `${ipad}fadd`
+        server4 = `${ipad}fdelet`
+        server5 = `${ipad}fedit`
+    } catch (error) {
+        console.error("Could not fetch IP:", error);
+    }
+}
+
 async function initializePageWithKey() {
+    fetchIP()
     try {
         const response1 = await fetch(server1, {
             method: "POST",

@@ -1,7 +1,7 @@
 document.getElementById("signup").addEventListener("click", () => {
-    window.location.href = "signup.html"
+    window.location.href = "./frountend/signup.html"
 })
 document.getElementById("login").addEventListener("click", () => {
-    window.location.href = "login.html"
+    window.location.href = "./frountend/login.html"
 })
 

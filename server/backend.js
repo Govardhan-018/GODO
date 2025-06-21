@@ -1,7 +1,14 @@
 import pg from "pg"
 import express from "express"
-import axios from "axios"
+import os from "os"
 import cors from "cors"
+import fs from "fs"
+import path from "path"
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const port = 3069
 const app = express()
@@ -10,6 +17,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
+function getLocalIPAddress() {
+    const interfaces = os.networkInterfaces();
+    for (const name in interfaces) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return 'localhost';
+}
 
 function customDecrypt(encryptedBase64, key = 7) {
     const encrypted = Buffer.from(encryptedBase64, 'base64').toString('binary');
@@ -202,7 +220,7 @@ app.post("/fdelet", async (req, res) => {
     const family = req.body.family
     key = await customDecrypt(key, 42)
     let email = key.split("::")[0]
-    console.log(id+email+family)
+    console.log(id + email + family)
     const query = "DELETE FROM family WHERE id=$1 AND email=$2 AND family_name=$3"
     try {
         await db.query(query, [id, email, family])
@@ -219,12 +237,12 @@ app.post("/fedit", async (req, res) => {
     var key = req.body.key
     const id = req.body.id
     const todo = req.body.todo
-    const family=req.body.family
+    const family = req.body.family
     key = await customDecrypt(key, 42)
     let email = key.split("::")[0]
     const query = "UPDATE family SET todo = $1 WHERE id = $2 AND email = $3 AND family_name=$4"
     try {
-        const data = await db.query(query, [todo, id, email,family])
+        const data = await db.query(query, [todo, id, email, family])
         res.status(201).json({
             st: "success", data: data.rows
         })
@@ -234,6 +252,8 @@ app.post("/fedit", async (req, res) => {
         })
     }
 })
-app.listen(port, (req, res) => {
-    console.log("Server is host on " + port)
+app.listen(port, async (req, res) => {
+    const localIP = await getLocalIPAddress();
+    fs.writeFileSync(path.join(__dirname, '../ip.txt'), localIP)
+    console.log("Server is host on " + localIP + "/" + port)
 })
